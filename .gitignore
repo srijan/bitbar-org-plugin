@@ -1,2 +1,8 @@
-enabled/
-plugin
+*
+
+!.gitignore
+!LICENSE
+!README.md
+!Makefile
+!config.h
+!plugin.c
