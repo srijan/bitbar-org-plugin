@@ -36,12 +36,18 @@ typedef struct {
 static regex_t dln_re;
 static regex_t sched_re;
 
+#define menu_item(fmt, ...) \
+  printf(fmt " | length=%d font=%s size=%d" RESET "\n", \
+         ##__VA_ARGS__, MAX_WIDTH, font, font_size)
+
 #ifdef DEBUG
 #define dbg(fmt, ...)                                               \
   fprintf(stderr, "%s:%d: " fmt, __FILE__, __LINE__, ##__VA_ARGS__)
 #else
 #define dbg(...) {}
 #endif
+
+#define array_len(x) (sizeof(x) / sizeof(x[0]))
 
 #define die(msg)                                \
   do {                                          \
@@ -249,33 +255,53 @@ int schedCmp(void *thunk, const void *a, const void *b) {
 
 void print_group(vec_todo_t *v, vec_size_t *idx, char *header, task_type type) {
   static int limit = MAX_PRINT;
-  char date[20];
+  char *line;
+  char date[20], priority[20];
 
   if (limit <= 0 || idx->n == 0)
     return;
 
   todo_t *task;
-  printf("\033[1;36m%s\n", header);
+  menu_item("%s%s", header_color, header);
 
   for (size_t i = 0; i < idx->n && limit >= 0; i++, limit--) {
     task = get_todo_t(v, *get_size_t(idx, i));
 
+    priority[0] = '\0';
+    line = trimlc(task->line, ' ');
+
+    if (line[0] == '[') {
+      for (size_t i = 0; i < array_len(priorities); i++) {
+        if (strncmp(line, priorities[i], 4) != 0)
+          continue;
+
+        sprintf(priority, "%s%s ", priority_colors[i], priorities[i]);
+        line = line + 4;
+        break;
+      }
+    }
+
     switch (type) {
     case DEADLINED:
+      strftime(date, sizeof(char) * 20, "%h-%d", &task->dln);
+      menu_item("%s%s: %s %s%s%s", deadline_task_color, task->file,
+                date, priority, deadline_task_color, line);
+      break;
     case SCHEDULED:
-      strftime(date, sizeof(char) * 20, "%h %d",
-               (type == DEADLINED) ? &task->dln : &task->sched);
-      printf("%s: [%s] %s | color=red length=50\n", task->file, date, task->line);
+      strftime(date, sizeof(char) * 20, "%h-%d", &task->sched);
+      menu_item("%s%s: %s %s%s%s", scheduled_task_color, task->file,
+                date, priority, scheduled_task_color, line);
       break;
     case OPEN:
-      printf("%s: %s | length=50\n", task->file, task->line);
+      menu_item("%s%s: %s%s%s", unscheduled_task_color, task->file,
+                priority, unscheduled_task_color, line);
       break;
     }
   }
 }
 
 void print(vec_todo_t *v, vec_size_t **visitors) {
-  printf("Org-tasks: %ld\n", v->n);
+  printf("Org-todo: %ld\n", v->n);
   puts("---");
 
   print_group(v, visitors[DEADLINED], "Deadlines", DEADLINED);
