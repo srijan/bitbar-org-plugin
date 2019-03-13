@@ -1,3 +1,11 @@
+/*
+ * Org-mode bitbar plugin
+ *
+ * Displays TODO items sorted according to DEADLINE and SCHEDULED
+ * timestamps. Configuration options can be found in config.h.
+ *
+ */
+
 #include <errno.h>
 #include <glob.h>
 #include <libgen.h>
@@ -8,8 +16,8 @@
 #include <string.h>
 #include <time.h>
 
-#define CONFIG_DIR "~/notes"
-#define MAX_PRINT 25
+#include "config.h"
+
 #define VEC_CAPACITY 50
 
 typedef enum {
@@ -287,9 +295,8 @@ int main(void) {
   if (ret)
     die("Unable to compile scheduled regex");
 
-  const char *pattern = CONFIG_DIR "/*.org";
   glob_t g;
-  if (glob(pattern, GLOB_TILDE, NULL, &g) != 0)
+  if (glob(org_file_pattern, GLOB_TILDE, NULL, &g) != 0)
     die(strerror(errno));
 
   for (size_t i = 0; i < g.gl_pathc; i++) {
