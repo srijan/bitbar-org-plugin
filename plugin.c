@@ -158,6 +158,10 @@ bool parse_file(vec_todo_t *v, char *f) {
   if (!(fp = fopen(f, "r")))
     return false;
 
+  // Strip .org extension
+  char *c = rindex(filename, '.');
+  *c = '\0';
+
   char *line = NULL;
   size_t linecap = 0;
   ssize_t len;
