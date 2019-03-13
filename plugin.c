@@ -192,18 +192,12 @@ bool parse_file(vec_todo_t *v, char *f) {
       if (!(task->file = strdup(filename)) || !(task->line = strdup(ss)))
         die("Memory error");
     } else if (task) {
-      if (!sched) {
-        if (!set_date(line, &sched_re, &task->sched))
-          continue;
-
+      if (!sched && set_date(line, &sched_re, &task->sched)) {
         task->sched_time = mktime(&task->sched);
         sched = true;
       }
 
-      if (!dln) {
-        if (!set_date(line, &dln_re, &task->dln))
-          continue;
-
+      if (!dln && set_date(line, &dln_re, &task->dln)) {
         task->dln_time = mktime(&task->dln);
         dln = true;
       }
