@@ -1,14 +1,12 @@
-/* ANSI Colors */
-#define RESET   "\x1b[0m"
+#define BLACK   "#403842"
+#define RED     "#CA411E"
+#define GREEN   "#9AC666"
+#define YELLOW  "#E6B352"
+#define BLUE    "#5350C3"
+#define MAGENTA "#9B7E9B"
+#define CYAN    "#6FC1B6"
+#define GREY    "#959894"
 
-#define BLACK   "\x1b[30m"
-#define RED     "\x1b[31m"
-#define GREEN   "\x1b[32m"
-#define YELLOW  "\x1b[33m"
-#define BLUE    "\x1b[34m"
-#define MAGENTA "\x1b[35m"
-#define CYAN    "\x1b[36m"
-#define WHITE   "\x1b[37m"
 
 /* Maximum number of tasks to display in dropdown menu */
 #define MAX_PRINT 25
@@ -28,8 +26,8 @@ const int font_size = 12;
 
 /* Color Options */
 const char *header_color = YELLOW;
-const char *scheduled_task_color = CYAN;
+const char *scheduled_task_color = BLUE;
 const char *deadline_task_color = RED;
-const char *unscheduled_task_color = BLUE;
+const char *unscheduled_task_color = GREY;
 
 const char *priority_colors[] =  { RED, GREEN, CYAN };

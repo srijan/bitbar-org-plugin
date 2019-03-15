@@ -37,7 +37,7 @@ static regex_t dln_re;
 static regex_t sched_re;
 
 #define menu_item(fmt, ...) \
-  printf(fmt " | length=%d font=%s size=%d" RESET "\n", \
+  printf(fmt " length=%d font=%s size=%d\n", \
          ##__VA_ARGS__, MAX_WIDTH, font, font_size)
 
 #ifdef DEBUG
@@ -253,48 +253,48 @@ int schedCmp(void *thunk, const void *a, const void *b) {
                   (get_todo_t(thunk, *(size_t *) b))->sched_time);
 }
 
+const char *get_line_color(char *str, const char *fallback) {
+  str = trimlc(str, ' ');
+  if (str[0] != '[')
+    return fallback;
+
+  for (size_t i = 0; i < array_len(priorities); i++) {
+    if (strncasecmp(str, priorities[i], 4) != 0)
+      continue;
+
+    return priority_colors[i];
+  }
+
+  return fallback;
+}
+
 void print_group(vec_todo_t *v, vec_size_t *idx, char *header, task_type type) {
   static int limit = MAX_PRINT;
-  char *line;
-  char date[20], priority[20];
+  char date[20];
 
   if (limit <= 0 || idx->n == 0)
     return;
 
   todo_t *task;
-  menu_item("%s%s", header_color, header);
+  menu_item("%s | color=%s", header, header_color);
 
   for (size_t i = 0; i < idx->n && limit >= 0; i++, limit--) {
     task = get_todo_t(v, *get_size_t(idx, i));
 
-    priority[0] = '\0';
-    line = trimlc(task->line, ' ');
-
-    if (line[0] == '[') {
-      for (size_t i = 0; i < array_len(priorities); i++) {
-        if (strncmp(line, priorities[i], 4) != 0)
-          continue;
-
-        sprintf(priority, "%s%s ", priority_colors[i], priorities[i]);
-        line = line + 4;
-        break;
-      }
-    }
-
     switch (type) {
     case DEADLINED:
       strftime(date, sizeof(char) * 20, "%h-%d", &task->dln);
-      menu_item("%s%s: %s %s%s%s", deadline_task_color, task->file,
-                date, priority, deadline_task_color, line);
+      menu_item("%s: %s %s | color=%s", task->file, date, task->line,
+                get_line_color(task->line, deadline_task_color));
       break;
     case SCHEDULED:
       strftime(date, sizeof(char) * 20, "%h-%d", &task->sched);
-      menu_item("%s%s: %s %s%s%s", scheduled_task_color, task->file,
-                date, priority, scheduled_task_color, line);
+      menu_item("%s: %s %s | color=%s", task->file, date, task->line,
+                get_line_color(task->line, scheduled_task_color));
       break;
     case OPEN:
-      menu_item("%s%s: %s%s%s", unscheduled_task_color, task->file,
-                priority, unscheduled_task_color, line);
+      menu_item("%s: %s | color=%s", task->file, task->line,
+                get_line_color(task->line, unscheduled_task_color));
       break;
     }
   }
