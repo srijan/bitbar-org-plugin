@@ -2,6 +2,8 @@
 
 [Bitbar](https://github.com/matryer/bitbar) plugin to display the number of open Org mode TODO items. This entire program could easily be replaced by a simple shell script, but where's the fun in that...
 
+![screenshot](screenshot.png)
+
 ### Installation
 
 No external dependencies are required. Configuration options can be found in `config.h`. The plugin can be built using a simple invocation of make.
