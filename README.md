@@ -1,3 +1,10 @@
+## Fork notes
+
+* Made compatible with Linux
+* Tested with [Kargos](https://github.com/lipido/kargos)
+
+*Original README below*
+
 ## Org Mode TODO Plugin
 
 [Bitbar](https://github.com/matryer/bitbar) plugin to display the number of open Org mode TODO items. This entire program could easily be replaced by a simple shell script, but where's the fun in that...

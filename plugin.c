@@ -6,6 +6,8 @@
  *
  */
 
+#define _GNU_SOURCE
+#define __USE_XOPEN
 #include <errno.h>
 #include <glob.h>
 #include <libgen.h>
@@ -243,12 +245,12 @@ void partition(vec_todo_t *tasks, vec_size_t **visitors) {
 }
 
 
-int dlnCmp(void *thunk, const void *a, const void *b) {
+int dlnCmp(const void *a, const void *b, void *thunk) {
   return difftime(get_todo_t(thunk, *(size_t *) a)->dln_time,
                   get_todo_t(thunk, *(size_t *) b)->dln_time);
 }
 
-int schedCmp(void *thunk, const void *a, const void *b) {
+int schedCmp(const void *a, const void *b, void *thunk) {
   return difftime((get_todo_t(thunk, *(size_t *) a))->sched_time,
                   (get_todo_t(thunk, *(size_t *) b))->sched_time);
 }
@@ -336,11 +338,11 @@ int main(void) {
 
   partition(tasks, visitors);
 
-  // macOS/FreeBSD only
+  // GNU/Linux only
   qsort_r(visitors[DEADLINED]->data, visitors[DEADLINED]->n,
-          sizeof(size_t), tasks, dlnCmp);
+          sizeof(size_t), dlnCmp, tasks);
   qsort_r(visitors[SCHEDULED]->data, visitors[SCHEDULED]->n,
-          sizeof(size_t), tasks, schedCmp);
+          sizeof(size_t), schedCmp, tasks);
 
   print(tasks, visitors);
 
